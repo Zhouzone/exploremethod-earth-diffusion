@@ -1,0 +1,1675 @@
+{
+  "topic_id": "earth-weather-foundation",
+  "title": "从单一 Earth forecasting 到统一 weather foundation model",
+  "subtitle": "用一个真实 topic chain 展示 ExploreMethod 如何判断问题价值与更新价值",
+  "display_notes": {
+    "schema_note": "字段标签、对象解释和指标说明已经中文化；字段值保留当前真实 pipeline 输出原文，方便后续审计。",
+    "schema_intro": {
+      "title": "为什么先做 Schema 重建",
+      "body": "这里不是在把论文摘要重写一遍，而是在把论文承载的科学问题 P、科学工作 W 和问题更新 P' 重建出来。只有先把这三个对象明确下来，后面的 P-value 与 W-update 才有稳定、可解释的 judge 对象。"
+    }
+  },
+  "home": {
+    "hero": {
+      "label": "ExploreMethod",
+      "title": "用一条真实论文演化链说明：我们如何评估问题价值与更新价值",
+      "subtitle": "首页先介绍框架目标和 judge 准则；点击图中的任一论文，再看这篇论文的完整分析与评分理由。"
+    },
+    "goal_sections": [
+      {
+        "title": "项目目标",
+        "body": "这不是一个给 paper 排名的页面。它要展示的是：如何把论文重建成科学问题 P、科学工作 W，以及问题更新 P -> P'，并据此评估什么问题值得做、什么工作真正推进了前沿。"
+      },
+      {
+        "title": "为什么不是 paper 排名",
+        "body": "论文只是载体。我们真正 judge 的对象，是论文承载的科学问题和科学工作，而不是 paper 写得是否漂亮、是否热门。"
+      }
+    ],
+    "graph_intro": {
+      "title": "案例图谱",
+      "body": "这里先用四篇主链论文做一个最小 case：从单任务 forecasting，到极端降水 nowcasting，再到 weather generalist，最后到 generation 与 understanding 的统一。"
+    },
+    "case_study": {
+      "title": "这个案例怎么来的",
+      "subtitle": "这个四篇主链不是随意拼出来的，而是按照原型方法学一步步构造出来的展示性 case。",
+      "sections": [
+        {
+          "title": "为什么选这四篇",
+          "body": "我们没有把所有论文平铺展示，而是选了一条更容易解释框架目标的 topic chain：Earthformer 先立住单任务 Earth forecasting，CasCast 把问题推进到极端降水 nowcasting，WeatherGFM 把问题扩展到 weather generalist，Omni-Weather 再把 generation 与 understanding 统一起来。"
+        },
+        {
+          "title": "论文怎么被解析",
+          "body": "每篇论文都先经过选择性解析，不是整篇全文直接喂给模型。主解析章节集中在 Abstract、Introduction、Related Work、Results / Experiments 以及 Conclusion / Future Work，默认跳过 References、Appendix 和大部分 Method，以降低噪声。"
+        },
+        {
+          "title": "怎么变成 P / W / P'",
+          "body": "解析后的选定章节不会直接拿来打分，而是先被重建成三个 canonical 对象：科学问题 P、科学工作 W，以及工作把问题推进后的 P'。这一步就是页面里看到的 Schema 重建，它把论文从“文字载体”变成后续可以 judge 的对象。"
+        },
+        {
+          "title": "分数怎么来的",
+          "body": "在 P / W / P' 明确之后，系统才会分别计算 P-value 和 W-update。前者判断这个问题值不值得成为研究对象，后者判断这项工作是否真的把问题向前推进。页面里的子指标和理由，都是围绕这两个 judge 展开的。"
+        },
+        {
+          "title": "为什么它只是一个 case",
+          "body": "这个例子不是要证明这四篇论文本身构成唯一正确的历史叙事，而是为了让人看到：同一条 topic evolution 可以怎样被结构化成问题、工作、更新，再进一步变成一个可解释的 benchmark judge。"
+        }
+      ]
+    }
+  },
+  "framework": {
+    "core_goal": "这个页面要展示的不是 paper 排名，而是框架如何把 topic 演化拆成问题、工作、更新，并进一步判断什么问题值得做、什么工作真的推进了前沿。",
+    "objects": [
+      {
+        "name": "P",
+        "label": "科学问题",
+        "description": "被结构化表达、可公共研究的未知。"
+      },
+      {
+        "name": "W",
+        "label": "科学工作",
+        "description": "由表示、程序、证据和知识主张构成的一次认知推进。"
+      },
+      {
+        "name": "P'",
+        "label": "更新后问题",
+        "description": "工作完成后被推进出来的新问题状态。"
+      },
+      {
+        "name": "P-value",
+        "label": "问题价值",
+        "description": "这个问题是否值得成为研究对象。"
+      },
+      {
+        "name": "W-update",
+        "label": "更新价值",
+        "description": "这项工作是否真实推进了问题。"
+      }
+    ]
+  },
+  "benchmark_explanations": {
+    "p_value": {
+      "label": "问题价值 P-value",
+      "purpose": "判断一个科学问题是否值得成为研究对象，并能否组织后续高价值科学推进。",
+      "source_logic": "来源于 exploremethod 对科学问题 P 的定义，以及“评估科学问题价值”这一系统目标的操作化。",
+      "dimensions": {
+        "problem_validity": {
+          "label": "问题有效性",
+          "purpose": "判断这个候选是否真是一个结构良好的科学问题，而不是泛话题、工程目标或口号。",
+          "source_type": "理论原生维度",
+          "source_basis": "直接来自 P = (O, A, Δ, Φ) 的形式化定义。"
+        },
+        "compression_potential": {
+          "label": "可压缩潜力",
+          "purpose": "判断这个问题是否存在可操作的观测、干预或判别路径，使未定空间能够被推进。",
+          "source_type": "理论原生维度",
+          "source_basis": "来自 Δ、Ω、τ 的判别压缩逻辑。"
+        },
+        "boundary_importance": {
+          "label": "边界重要性",
+          "purpose": "判断推进这个问题是否会真实影响科学边界，而不只是优化一个局部细节。",
+          "source_type": "目标操作化维度",
+          "source_basis": "来自 exploremethod 中“评估科学边界突破价值”的系统目标。"
+        },
+        "update_generativity": {
+          "label": "更新生成性",
+          "purpose": "判断这个问题是否能组织后续工作链，并诱导出新的问题状态或方法分支。",
+          "source_type": "目标操作化维度",
+          "source_basis": "来自问题通过 W 持续被更新为 P' 的动态逻辑。"
+        },
+        "residual_openness_quality": {
+          "label": "剩余开放结构质量",
+          "purpose": "判断问题在已有推进后留下的开放部分是否仍然科学上肥沃，而不是只剩清理尾活。",
+          "source_type": "目标操作化维度",
+          "source_basis": "来自 Λ 及其对高质量残余开放结构的强调。"
+        }
+      }
+    },
+    "w_update": {
+      "label": "更新价值 W-update",
+      "purpose": "判断一项科学工作是否真的把问题从 P 推进到了新的问题状态 P'。",
+      "source_logic": "来源于 exploremethod 对科学工作 W、知识主张 K、未闭合结构 Λ 以及问题更新 P -> P' 的定义。",
+      "dimensions": {
+        "delta_update": {
+          "label": "未定空间更新",
+          "purpose": "判断工作是否改变了核心未定空间 Δ，而不是只做局部调参。",
+          "source_type": "理论原生维度",
+          "source_basis": "来自 fΔ、Δ -> Δ' 以及对未定空间压缩或重组的刻画。"
+        },
+        "phi_update": {
+          "label": "问题框架更新",
+          "purpose": "判断工作是否改写了问题框架 Φ，包括假设、通道和判据。",
+          "source_type": "理论原生维度",
+          "source_basis": "来自 fΦ 与对 Σ / Ω / τ 更新的刻画。"
+        },
+        "new_aspect_exposure": {
+          "label": "新方面暴露",
+          "purpose": "判断工作是否暴露出新的值得研究的方面，而不仅是回答旧问题。",
+          "source_type": "理论原生维度",
+          "source_basis": "来自 Λ_A 与 fA 的更新逻辑。"
+        },
+        "knowledge_strength": {
+          "label": "知识主张强度",
+          "purpose": "判断工作是否形成了清楚且带有效域的知识主张 K，而不只是给出结果表象。",
+          "source_type": "理论原生维度",
+          "source_basis": "来自 K = (κ, σ) 的定义。"
+        },
+        "evidence_strength": {
+          "label": "证据强度",
+          "purpose": "判断证据 E 是否足够支撑知识主张，而不是只有结论没有支撑链。",
+          "source_type": "理论原生维度",
+          "source_basis": "来自 W 中证据 E 的公共可检验要求。"
+        },
+        "problem_transition_quality": {
+          "label": "问题转移质量",
+          "purpose": "判断这项工作是否真的形成了连贯的 P -> P' 更新链，而不是停留在局部结果。",
+          "source_type": "理论原生维度",
+          "source_basis": "来自 (P, R, Π) -> E -> (K, Λ) -> P' 与 Ψ 的整体链条。"
+        }
+      }
+    }
+  },
+  "graph": {
+    "nodes": [
+      {
+        "paper_id": "earthformer_2207_05833",
+        "order": 1,
+        "title": "Earthformer: Exploring Space-Time Transformers for Earth System Forecasting",
+        "short_label": "Earthformer",
+        "stage_label": "单任务 Earth forecasting",
+        "year": 2022,
+        "teaser": "把问题立在可扩展的时空 Transformer forecasting 上。",
+        "x": 10,
+        "y": 72
+      },
+      {
+        "paper_id": "cascast_2402_04290",
+        "order": 2,
+        "title": "CasCast: Skillful High-resolution Precipitation Nowcasting via Cascaded Modelling",
+        "short_label": "CasCast",
+        "stage_label": "极端降水 nowcasting",
+        "year": 2024,
+        "teaser": "把问题推进到高分辨率、极端事件与生成式建模。",
+        "x": 35,
+        "y": 54
+      },
+      {
+        "paper_id": "weathergfm_2411_05420",
+        "order": 3,
+        "title": "WeatherGFM: Learning A Weather Generalist Foundation Model via In-context Learning",
+        "short_label": "WeatherGFM",
+        "stage_label": "weather generalist",
+        "year": 2024,
+        "teaser": "从单任务模型走向统一多任务、多模态 weather model。",
+        "x": 64,
+        "y": 38
+      },
+      {
+        "paper_id": "omni_weather_2512_21643",
+        "order": 4,
+        "title": "Omni-Weather: Unified Multimodal Foundation Model for Weather Generation and Understanding",
+        "short_label": "Omni-Weather",
+        "stage_label": "generation + understanding unified",
+        "year": 2025,
+        "teaser": "把 generation、understanding 和 reasoning 合到同一框架里。",
+        "x": 88,
+        "y": 22
+      }
+    ],
+    "edges": [
+      {
+        "source": "earthformer_2207_05833",
+        "target": "cascast_2402_04290",
+        "label": "问题被进一步推进"
+      },
+      {
+        "source": "cascast_2402_04290",
+        "target": "weathergfm_2411_05420",
+        "label": "问题被进一步推进"
+      },
+      {
+        "source": "weathergfm_2411_05420",
+        "target": "omni_weather_2512_21643",
+        "label": "问题被进一步推进"
+      }
+    ]
+  },
+  "papers": [
+    {
+      "paper_id": "earthformer_2207_05833",
+      "order": 1,
+      "title": "Earthformer: Exploring Space-Time Transformers for Earth System Forecasting",
+      "year": 2022,
+      "short_label": "Earthformer",
+      "stage_label": "单任务 Earth forecasting",
+      "graph_teaser": "把问题立在可扩展的时空 Transformer forecasting 上。",
+      "problem": {
+        "problem_id": "problem.earthformer.earth_system_forecasting_with_efficient_space_time_transformers",
+        "summary": "The paper targets the problem of forecasting Earth system dynamics from spatiotemporal observation data by building a space-time Transformer that is computationally feasible on high-dimensional inputs and effective for complex, chaotic dependencies across tasks such as precipitation nowcasting and ENSO forecasting.",
+        "Delta": "how to design a space-time Transformer that can model complex and long-range dependencies in high-dimensional, chaotic Earth systems while avoiding the infeasible computational cost of naive O(N2) attention"
+      },
+      "work": {
+        "work_id": "work.earthformer.cuboid_attention_space_time_transformer",
+        "summary": "Earthformer reframes Earth system forecasting around scalable space-time Transformer design: local cuboid self-attention handles tractability, global vectors provide cross-cuboid communication, and hierarchical axial attention emerges from ablation as the preferred configuration for nowcasting and climate forecasting.",
+        "E_summary": "Across synthetic MovingMNIST and N-body MNIST and real-world SEVIR precipitation nowcasting and ICAR-ENSO forecasting, Earthformer is reported to achieve the best overall or state-of-the-art performance, with particularly strong gains from global vectors and improved high-threshold CSI on SEVIR."
+      },
+      "update": {
+        "update_id": "update.earthformer.space_time_transformer_for_earth_system_forecasting",
+        "delta_update_summary": "Earthformer updates the field from an open question about whether a computationally feasible Transformer can be designed for high-dimensional Earth system forecasting to a demonstrated setting where cuboid-based space-time attention with global vectors achieves strong empirical performance and state of the art results on multiple benchmarks.",
+        "phi_update_summary": "The work shifts the modeling hypothesis from primarily CNN/RNN inductive-bias-driven forecasting and infeasible naive full attention to a structured Transformer formulation built from local cuboid self-attention plus global vectors and hierarchical encoder-decoder design.",
+        "aspect_update_summary": "After this work, the salient next-step aspects become handling forecast uncertainty with probabilistic modeling and incorporating physical knowledge or constraints into the otherwise purely data-driven architecture.",
+        "transition_rationale": "The selected sections explicitly frame scalable space-time Transformer design for Earth system forecasting as largely open because naive O(N2) attention is infeasible, then present Earthformer as an efficient cuboid-attention solution validated by ablations and state-of-the-art results on synthetic and real-world datasets. The conclusion then redefines the remaining limitations around determinism, lack of uncertainty modeling, and absence of physical knowledge integration, indicating the problem has advanced to these next challenges."
+      },
+      "score_summary": {
+        "p_value": {
+          "benchmark_name": "p_value",
+          "paper_id": "earthformer_2207_05833",
+          "dimension_scores": {
+            "problem_validity": 5,
+            "compression_potential": 4,
+            "boundary_importance": 5,
+            "update_generativity": 4,
+            "residual_openness_quality": 4
+          },
+          "dimension_rationales": {
+            "problem_validity": "The problem is clearly real, well-motivated, and directly supported by concrete forecasting tasks and computational constraints.",
+            "compression_potential": "It unifies multiple Earth forecasting settings under one central bottleneck: scalable modeling of long-range spatiotemporal dependence.",
+            "boundary_importance": "The problem sharply defines an important frontier between expressive Transformer modeling and infeasible quadratic attention on high-dimensional Earth data.",
+            "update_generativity": "Progress on this problem naturally enables many architectural, efficiency, and benchmark updates across Earth system forecasting tasks.",
+            "residual_openness_quality": "The paper frames a substantial open residual question around scalable yet effective space-time Transformers, though the target is somewhat solution-shaped."
+          },
+          "overall_score": 4.4,
+          "summary": "This is a high-value problem because it is both practically important and technically crisp: Earth system forecasting needs models that capture complex long-range spatiotemporal structure without prohibitive attention cost. The formulation compresses several application areas into one core challenge, marks a meaningful capability boundary for Transformers in this domain, and leaves room for further advances beyond the specific Earthformer design.",
+          "display_summary": "这是一个高价值问题，因为它既有现实重要性，也有清晰的技术边界：Earth system forecasting 需要能够捕捉复杂长程时空结构、同时又不被高昂注意力成本拖垮的模型。这个问题把多个应用场景压缩到同一个核心挑战上，清楚标出了 Transformer 在该领域的能力边界，也为超越 Earthformer 具体设计的后续推进留下了空间。",
+          "display_dimension_rationales": {
+            "problem_validity": "这个问题真实存在、动机充分，并且有具体的 forecasting 任务与计算约束直接支撑。",
+            "compression_potential": "它把多个 Earth forecasting 场景统一到同一个核心瓶颈上：如何可扩展地建模长程时空依赖。",
+            "boundary_importance": "它清楚界定了一个重要前沿：在高维 Earth data 上，表达力更强的 Transformer 建模与不可承受的二次注意力成本之间的边界。",
+            "update_generativity": "一旦这个问题取得进展，就会自然带动 Earth system forecasting 中架构、效率和 benchmark 等多个方向的后续更新。",
+            "residual_openness_quality": "论文仍然保留了一个实质性的开放余量：如何在保持可扩展性的同时做出更有效的时空 Transformer，只是这个开放问题已经略带解法形状。"
+          }
+        },
+        "w_update": {
+          "benchmark_name": "w_update",
+          "paper_id": "earthformer_2207_05833",
+          "dimension_scores": {
+            "delta_update": 5,
+            "phi_update": 5,
+            "new_aspect_exposure": 4,
+            "knowledge_strength": 5,
+            "evidence_strength": 5,
+            "problem_transition_quality": 5
+          },
+          "dimension_rationales": {
+            "delta_update": "It strongly resolves the prior open scalability barrier by showing an efficient Transformer design that works well on Earth forecasting tasks.",
+            "phi_update": "It introduces a clear new modeling formulation centered on cuboid attention, global vectors, and hierarchical space-time Transformer structure.",
+            "new_aspect_exposure": "It clearly exposes next challenges in uncertainty modeling and physics integration, though these are framed mainly as limitations and future work.",
+            "knowledge_strength": "The paper delivers a strong reusable claim that structured local-global attention can outperform prior CNN/RNN and Transformer baselines in this domain.",
+            "evidence_strength": "The update is backed by ablations plus synthetic and real-world benchmark results, including reported state-of-the-art performance.",
+            "problem_transition_quality": "The transition is explicit and coherent from an open design problem to a more advanced problem focused on probabilistic and physics-informed forecasting."
+          },
+          "overall_score": 4.8,
+          "summary": "This is a high-value update because the paper does more than offer an incremental model improvement: it substantially advances the previously open problem of scalable Transformer design for Earth system forecasting, supplies a concrete architectural hypothesis with strong empirical support, and cleanly reframes the remaining frontier around uncertainty and physics-informed modeling. The only slight reduction is that the newly exposed aspects are identified more as limitations than deeply developed successor problem formulations.",
+          "display_summary": "这是一次高价值更新，因为这篇论文不只是给出一个增量模型改进：它实质性推进了此前尚未解决的 Earth system forecasting 可扩展 Transformer 设计问题，提出了一个有较强实证支持的具体架构假设，并把剩余前沿更清楚地重构到不确定性建模和 physics-informed modeling 上。唯一稍弱的地方在于，新暴露出来的方面更多是以限制和未来工作的形式出现，而不是被充分展开成后继问题表述。",
+          "display_dimension_rationales": {
+            "delta_update": "它通过展示一种在 Earth forecasting 任务上表现良好的高效 Transformer 设计，显著缓解了此前关于可扩展性的核心开放障碍。",
+            "phi_update": "它提出了一个清晰的新问题表述，核心是 cuboid attention、global vectors 和分层时空 Transformer 结构。",
+            "new_aspect_exposure": "它清楚暴露了下一步挑战，包括不确定性建模和物理约束整合，只是这些内容目前主要仍以局限与未来工作来表述。",
+            "knowledge_strength": "论文给出了一个较强且可复用的知识主张：结构化的局部-全局注意力在这个领域中可以优于先前的 CNN/RNN 和 Transformer 基线。",
+            "evidence_strength": "这次更新有 ablation、合成数据和真实 benchmark 结果共同支撑，并且报告了 state-of-the-art 表现。",
+            "problem_transition_quality": "它把问题从“如何设计可扩展 Transformer”明确推进到了“如何做概率化、物理约束化 forecasting”这一更进一步的问题状态。"
+          }
+        }
+      },
+      "schema_views": {
+        "problem_unit": {
+          "label": "问题对象 problem_unit",
+          "description": "重建论文中的科学问题 P = (O, A, Δ, Φ)。",
+          "fields": [
+            {
+              "label": "问题标识",
+              "key": "problem_id",
+              "value": "problem.earthformer.earth_system_forecasting_with_efficient_space_time_transformers",
+              "origin": null,
+              "origin_label": null
+            },
+            {
+              "label": "研究对象 O",
+              "key": "O",
+              "value": "spatiotemporal Earth observation data for Earth system variabilities and forecasting targets such as precipitation nowcasting and ENSO sea surface temperature anomalies",
+              "origin": "normalized",
+              "origin_label": "标准化归一"
+            },
+            {
+              "label": "关注方面 A",
+              "key": "A",
+              "value": "Earth system forecasting with a space-time Transformer",
+              "origin": "normalized",
+              "origin_label": "标准化归一"
+            },
+            {
+              "label": "未定空间 Δ",
+              "key": "Delta",
+              "value": "how to design a space-time Transformer that can model complex and long-range dependencies in high-dimensional, chaotic Earth systems while avoiding the infeasible computational cost of naive O(N2) attention",
+              "origin": "inferred",
+              "origin_label": "跨证据归纳"
+            },
+            {
+              "label": "问题框架 Φ.Σ",
+              "key": "Phi.Sigma",
+              "value": [
+                "Earth system forecasting",
+                "chaotic, high-dimensional, spatiotemporal dynamics",
+                "limited adoption of Transformers in this domain"
+              ],
+              "origin": "inferred",
+              "origin_label": "跨证据归纳"
+            },
+            {
+              "label": "问题框架 Φ.Ω",
+              "key": "Phi.Omega",
+              "value": [
+                "high-dimensional Earth observation sequences",
+                "tasks including precipitation nowcasting and ENSO forecasting",
+                "comparison against CNN/RNN and recent Transformer-based baselines"
+              ],
+              "origin": "observed",
+              "origin_label": "原文直接给出"
+            },
+            {
+              "label": "问题框架 Φ.τ",
+              "key": "Phi.tau",
+              "value": [
+                "efficient attention computation",
+                "ability to capture complex and long-range dependencies",
+                "state-of-the-art forecasting performance on real-world benchmarks"
+              ],
+              "origin": "inferred",
+              "origin_label": "跨证据归纳"
+            },
+            {
+              "label": "问题摘要",
+              "key": "problem_summary",
+              "value": "The paper targets the problem of forecasting Earth system dynamics from spatiotemporal observation data by building a space-time Transformer that is computationally feasible on high-dimensional inputs and effective for complex, chaotic dependencies across tasks such as precipitation nowcasting and ENSO forecasting.",
+              "origin": null,
+              "origin_label": null
+            },
+            {
+              "label": "抽取置信度",
+              "key": "confidence",
+              "value": 0.95,
+              "origin": null,
+              "origin_label": null
+            }
+          ]
+        },
+        "work_unit": {
+          "label": "工作对象 work_unit",
+          "description": "重建论文中的科学工作 W 及其知识主张、证据与未闭合结构。",
+          "fields": [
+            {
+              "label": "工作标识",
+              "key": "work_id",
+              "value": "work.earthformer.cuboid_attention_space_time_transformer",
+              "origin": null,
+              "origin_label": null
+            },
+            {
+              "label": "关联问题",
+              "key": "linked_problem_ids",
+              "value": [
+                "problem.earth_system_forecasting",
+                "problem.precipitation_nowcasting",
+                "problem.enso_forecasting"
+              ],
+              "origin": null,
+              "origin_label": null
+            },
+            {
+              "label": "表示选择 R",
+              "key": "R",
+              "value": [
+                "space-time Transformer for Earth system forecasting",
+                "generic flexible efficient Cuboid Attention block that decomposes input tensors into non-overlapping cuboids and applies cuboid-level self-attention in parallel",
+                "collection of global vectors that attend to all local cuboids and let cuboids share system-level information",
+                "hierarchical encoder-decoder design with axial cuboid attention plus global vectors as the selected best configuration"
+              ],
+              "origin": "observed",
+              "origin_label": "原文直接给出"
+            },
+            {
+              "label": "操作程序 Π",
+              "key": "Pi",
+              "value": [
+                "reduce the infeasibility of naive O(N2) attention on high-dimensional Earth observation data by restricting self-attention to local cuboids",
+                "capture different space-time correlations through different cuboid decompositions and stack layers to model complex dynamics",
+                "use global vectors to communicate across local cuboids and summarize the overall system status",
+                "use findings from synthetic ablations to choose an axial-plus-global hierarchical Earthformer for real-world forecasting tasks"
+              ],
+              "origin": "inferred",
+              "origin_label": "跨证据归纳"
+            },
+            {
+              "label": "证据摘要 E",
+              "key": "E_summary",
+              "value": "Across synthetic MovingMNIST and N-body MNIST and real-world SEVIR precipitation nowcasting and ICAR-ENSO forecasting, Earthformer is reported to achieve the best overall or state-of-the-art performance, with particularly strong gains from global vectors and improved high-threshold CSI on SEVIR.",
+              "origin": null,
+              "origin_label": null
+            },
+            {
+              "label": "知识主张 K.κ",
+              "key": "K.kappa",
+              "value": "Efficient localized space-time attention organized as cuboid attention, augmented with global vectors and a hierarchical encoder-decoder, can model complex Earth-system spatiotemporal dependencies better than prior CNN/RNN and compared Transformer baselines.",
+              "origin": "inferred",
+              "origin_label": "跨证据归纳"
+            },
+            {
+              "label": "主张有效域 K.σ",
+              "key": "K.sigma",
+              "value": [
+                "MovingMNIST synthetic forecasting benchmark",
+                "newly proposed chaotic N-body MNIST benchmark",
+                "SEVIR precipitation nowcasting benchmark",
+                "ICAR-ENSO sea surface temperature anomalies forecasting benchmark"
+              ],
+              "origin": "observed",
+              "origin_label": "原文直接给出"
+            },
+            {
+              "label": "剩余未定结构 Λ.Δ",
+              "key": "Lambda.Lambda_delta",
+              "value": [
+                "Earthformer is a deterministic model that does not model uncertainty",
+                "the deterministic design may predict the average of plausible futures, generating blurry predictions with low perceptual quality and lacking valuable small-scale details",
+                "the model is purely data-driven and does not take advantage of physical knowledge of the Earth system"
+              ],
+              "origin": "observed",
+              "origin_label": "原文直接给出"
+            },
+            {
+              "label": "剩余框架问题 Λ.Φ",
+              "key": "Lambda.Lambda_phi",
+              "value": [
+                "the work leaves uncertainty-aware probabilistic forecasting and integration of physical knowledge as future directions rather than solving them within the presented model",
+                "evaluation of uncertainty is hindered because the community lacks appropriate metrics that measure the uncertainty component in Earth system forecasting models"
+              ],
+              "origin": "inferred",
+              "origin_label": "跨证据归纳"
+            },
+            {
+              "label": "新暴露方面 Λ.A",
+              "key": "Lambda.Lambda_A",
+              "value": [
+                "extend Earthformer to a probabilistic forecasting model",
+                "incorporate physical knowledge or physical constraints into Earthformer",
+                "ensemble predictions from data-driven and physics-based models"
+              ],
+              "origin": "observed",
+              "origin_label": "原文直接给出"
+            },
+            {
+              "label": "更新摘要 Ψ",
+              "key": "Psi_summary",
+              "value": "Earthformer reframes Earth system forecasting around scalable space-time Transformer design: local cuboid self-attention handles tractability, global vectors provide cross-cuboid communication, and hierarchical axial attention emerges from ablation as the preferred configuration for nowcasting and climate forecasting.",
+              "origin": null,
+              "origin_label": null
+            },
+            {
+              "label": "抽取置信度",
+              "key": "confidence",
+              "value": 0.93,
+              "origin": null,
+              "origin_label": null
+            }
+          ]
+        },
+        "update_case": {
+          "label": "更新对象 update_case",
+          "description": "显式表示工作如何把问题从 P 推进到 P'。",
+          "fields": [
+            {
+              "label": "更新标识",
+              "key": "update_id",
+              "value": "update.earthformer.space_time_transformer_for_earth_system_forecasting",
+              "origin": null,
+              "origin_label": null
+            },
+            {
+              "label": "更新前问题",
+              "key": "problem_before_id",
+              "value": "problem.earthformer.open_design_of_scalable_transformers_for_earth_system_forecasting",
+              "origin": null,
+              "origin_label": null
+            },
+            {
+              "label": "对应工作",
+              "key": "work_id",
+              "value": "work.earthformer.cuboid_attention_space_time_transformer",
+              "origin": null,
+              "origin_label": null
+            },
+            {
+              "label": "更新后问题",
+              "key": "problem_after_id",
+              "value": "problem.earthformer.probabilistic_and_physics_informed_earth_system_forecasting",
+              "origin": null,
+              "origin_label": null
+            },
+            {
+              "label": "Δ 更新摘要",
+              "key": "delta_update_summary",
+              "value": "Earthformer updates the field from an open question about whether a computationally feasible Transformer can be designed for high-dimensional Earth system forecasting to a demonstrated setting where cuboid-based space-time attention with global vectors achieves strong empirical performance and state of the art results on multiple benchmarks.",
+              "origin": null,
+              "origin_label": null
+            },
+            {
+              "label": "Φ 更新摘要",
+              "key": "phi_update_summary",
+              "value": "The work shifts the modeling hypothesis from primarily CNN/RNN inductive-bias-driven forecasting and infeasible naive full attention to a structured Transformer formulation built from local cuboid self-attention plus global vectors and hierarchical encoder-decoder design.",
+              "origin": null,
+              "origin_label": null
+            },
+            {
+              "label": "新方面暴露",
+              "key": "aspect_update_summary",
+              "value": "After this work, the salient next-step aspects become handling forecast uncertainty with probabilistic modeling and incorporating physical knowledge or constraints into the otherwise purely data-driven architecture.",
+              "origin": null,
+              "origin_label": null
+            },
+            {
+              "label": "问题转移理由",
+              "key": "transition_rationale",
+              "value": "The selected sections explicitly frame scalable space-time Transformer design for Earth system forecasting as largely open because naive O(N2) attention is infeasible, then present Earthformer as an efficient cuboid-attention solution validated by ablations and state-of-the-art results on synthetic and real-world datasets. The conclusion then redefines the remaining limitations around determinism, lack of uncertainty modeling, and absence of physical knowledge integration, indicating the problem has advanced to these next challenges.",
+              "origin": null,
+              "origin_label": null
+            },
+            {
+              "label": "抽取置信度",
+              "key": "confidence",
+              "value": 0.9,
+              "origin": null,
+              "origin_label": null
+            }
+          ]
+        }
+      }
+    },
+    {
+      "paper_id": "cascast_2402_04290",
+      "order": 2,
+      "title": "CasCast: Skillful High-resolution Precipitation Nowcasting via Cascaded Modelling",
+      "year": 2024,
+      "short_label": "CasCast",
+      "stage_label": "极端降水 nowcasting",
+      "graph_teaser": "把问题推进到高分辨率、极端事件与生成式建模。",
+      "problem": {
+        "problem_id": "problem.cascast.high_resolution_extreme_precipitation_nowcasting",
+        "summary": "The paper studies radar-based precipitation nowcasting, focusing on the unresolved difficulty of forecasting multiscale precipitation evolution and extreme precipitation at high spatial resolution. It frames the problem as needing a probabilistic yet computationally practical forecasting approach that can preserve mesoscale motion, generate small-scale details, and substantially improve regional extreme-event prediction over existing deterministic, GAN, and diffusion baselines.",
+        "Delta": "how to generate skillful short-term radar-based precipitation forecasts despite the difficulty of modeling complex precipitation system evolutions at different scales and producing accurate forecasts for extreme precipitation, while keeping probabilistic high-resolution modeling computationally feasible"
+      },
+      "work": {
+        "work_id": "work.cascast.cascaded_deterministic_probabilistic_nowcasting",
+        "summary": "CasCast reframes precipitation nowcasting from choosing between deterministic or probabilistic forecasting to a cascaded decomposition where deterministic mesoscale prediction and probabilistic small-scale generation are combined, with the next open questions centered on latent reconstruction limits and cross-dataset generalization.",
+        "E_summary": "Across SEVIR, HKO-7, and MeteoNet, CasCast achieves competitive overall performance and strong gains on extreme precipitation and regional pooled CSI metrics; on SEVIR it attains the lowest CRPS in Table 2 and improves CSI-219-POOL16 by up to 91.83% over the deterministic backbone in the ablation."
+      },
+      "update": {
+        "update_id": "update.cascast.cascaded_highres_extreme_nowcasting",
+        "delta_update_summary": "CasCast reduces uncertainty about whether high-resolution precipitation nowcasting can jointly handle multiscale evolution and extreme-event forecasting by using a cascaded deterministic-plus-probabilistic framework with latent-space diffusion, achieving competitive overall results and large gains for regional extreme precipitation.",
+        "phi_update_summary": "The work reframes the task from choosing between deterministic blur and unstable/high-cost probabilistic generation to a decoupled formulation: deterministic prediction for mesoscale precipitation distributions and probabilistic generation of small-scale patterns at high resolution in a low-dimensional latent space.",
+        "aspect_update_summary": "After this update, the salient remaining aspect is generalization across regions and radar datasets via a unified model, since the current method still requires retraining on each dataset; reconstruction fidelity for extreme-intensity echoes in the latent autoencoder also remains a limitation.",
+        "transition_rationale": "The paper begins from two stated unsolved challenges in precipitation nowcasting—multiscale evolution and accurate extreme-precipitation prediction—and presents CasCast as a cascaded solution that directly targets both. Experimental evidence shows strong performance, especially large improvements on regional extreme metrics, supporting that the problem state has advanced. In the conclusion and limitations, the authors then identify the next problem state as building a unified model that transfers across different datasets and regions rather than retraining separately."
+      },
+      "score_summary": {
+        "p_value": {
+          "benchmark_name": "p_value",
+          "paper_id": "cascast_2402_04290",
+          "dimension_scores": {
+            "problem_validity": 5,
+            "compression_potential": 4,
+            "boundary_importance": 5,
+            "update_generativity": 4,
+            "residual_openness_quality": 4
+          },
+          "dimension_rationales": {
+            "problem_validity": "The problem is clearly defined, empirically grounded, and directly supported by stated failures of prior deterministic and diffusion-based nowcasting methods.",
+            "compression_potential": "It unifies several recurring forecasting difficulties—multiscale dynamics, extremes, realism, and efficiency—under one coherent high-value problem frame.",
+            "boundary_importance": "The scope is well bounded by radar-based short-term nowcasting, benchmark datasets, forecast horizons, and concrete evaluation metrics including extreme-event emphasis.",
+            "update_generativity": "Progress on this problem would naturally produce many follow-on model, evaluation, and operational forecasting improvements across probabilistic nowcasting.",
+            "residual_openness_quality": "The remaining uncertainty is substantive and actionable because prior methods still struggle with high-resolution multiscale evolution and extreme precipitation forecasting."
+          },
+          "overall_score": 4.4,
+          "summary": "This is a strong and consequential problem: it is real, specific, and central to radar precipitation nowcasting, with clear practical stakes in extreme weather prediction. The problem is also well scoped and fertile for further advances because it ties together multiscale modeling, probabilistic high-resolution generation, and extreme-event skill, though it is somewhat application-specific rather than maximally general.",
+          "display_summary": "这是一个强且重要的问题：它真实、具体，而且处在 radar precipitation nowcasting 的核心位置，在极端天气预测上有明确的现实意义。这个问题也有良好的后续生长空间，因为它把多尺度建模、高分辨率概率生成和极端事件能力放在同一个高价值框架下，只是它的适用场景仍偏应用特定，而不是最一般化的问题表述。",
+          "display_dimension_rationales": {
+            "problem_validity": "这个问题定义清楚、经验上有支撑，并且直接对应以往 deterministic 和 diffusion nowcasting 方法的已知失败点。",
+            "compression_potential": "它把预测中反复出现的几个难点统一到了一个连贯的问题框架下，包括多尺度动力学、极端事件、真实性和效率。",
+            "boundary_importance": "它的边界被明确限制在基于 radar 的短期 nowcasting、具体 benchmark 数据集、forecast horizon 和强调极端事件的评估指标之内。",
+            "update_generativity": "如果这个问题被推进，会自然带来大量后续改进，包括概率 nowcasting 的模型设计、评估方式和业务化 forecasting 能力。",
+            "residual_openness_quality": "剩余不确定性既实质又可操作，因为先前方法在高分辨率多尺度演化和极端降水预测上仍然明显吃力。"
+          }
+        },
+        "w_update": {
+          "benchmark_name": "w_update",
+          "paper_id": "cascast_2402_04290",
+          "dimension_scores": {
+            "delta_update": 4,
+            "phi_update": 5,
+            "new_aspect_exposure": 4,
+            "knowledge_strength": 4,
+            "evidence_strength": 4,
+            "problem_transition_quality": 5
+          },
+          "dimension_rationales": {
+            "delta_update": "The work makes a substantial advance on the core challenge by showing strong high-resolution and extreme-precipitation gains, though it does not fully close the problem.",
+            "phi_update": "It clearly reframes nowcasting as a cascaded decomposition of deterministic mesoscale prediction and probabilistic local-detail generation in latent space.",
+            "new_aspect_exposure": "It exposes credible next-step issues, especially cross-dataset generalization and latent reconstruction limits for extreme echoes.",
+            "knowledge_strength": "The paper supports a fairly strong claim that the cascaded latent-diffusion design improves local patterns and regional extremes across benchmarks.",
+            "evidence_strength": "Evidence includes multi-dataset comparisons, probabilistic metrics, and ablations, but remains benchmark-focused rather than broader deployment validation.",
+            "problem_transition_quality": "The transition from unresolved multiscale/extreme nowcasting to unified cross-dataset modeling is explicit, well-motivated, and grounded in stated limitations."
+          },
+          "overall_score": 4.3,
+          "summary": "CasCast represents a strong update because it materially improves the original problem state and introduces a clear conceptual reframing through cascaded deterministic-plus-probabilistic forecasting. The empirical case is solid across multiple datasets and especially convincing on regional extreme-precipitation metrics, though not definitive enough to count as a full resolution. The paper also cleanly surfaces the next problem frontier—unified cross-dataset generalization—while acknowledging latent-space reconstruction limits for extreme events.",
+          "display_summary": "CasCast 是一次较强的更新，因为它实质性改善了原问题状态，并通过级联式 deterministic + probabilistic forecasting 给出了一个清晰的概念重构。它在多个数据集上的实证证据较扎实，尤其在区域极端降水指标上更有说服力，但还不足以算作问题的完全解决。论文也比较清楚地暴露了下一步前沿，即跨数据集统一泛化，以及 latent-space reconstruction 对极端事件的限制。",
+          "display_dimension_rationales": {
+            "delta_update": "这项工作在核心挑战上取得了实质推进，展示了更强的高分辨率表现和极端降水能力，但还没有把问题完全做完。",
+            "phi_update": "它把 nowcasting 明确重构为一个级联式分解：先做 deterministic 的 mesoscale prediction，再在 latent space 中生成 probabilistic 的局部细节。",
+            "new_aspect_exposure": "它暴露出了一批可信的下一步问题，尤其是跨数据集泛化以及对极端回波的 latent reconstruction 限制。",
+            "knowledge_strength": "论文较有力地支撑了一个主张：级联式 latent-diffusion 设计能够在 benchmark 上改善局部模式和区域极端事件表现。",
+            "evidence_strength": "证据包括多数据集比较、概率指标和 ablation，但目前仍以 benchmark 为中心，尚未扩展到更广的部署验证。",
+            "problem_transition_quality": "它把问题从“尚未解决的多尺度/极端 nowcasting”明确推进到了“如何做统一的跨数据集建模”，这个转移清楚、动机充分，而且由论文局限自然导出。"
+          }
+        }
+      },
+      "schema_views": {
+        "problem_unit": {
+          "label": "问题对象 problem_unit",
+          "description": "重建论文中的科学问题 P = (O, A, Δ, Φ)。",
+          "fields": [
+            {
+              "label": "问题标识",
+              "key": "problem_id",
+              "value": "problem.cascast.high_resolution_extreme_precipitation_nowcasting",
+              "origin": null,
+              "origin_label": null
+            },
+            {
+              "label": "研究对象 O",
+              "key": "O",
+              "value": "weather radar echo sequences for precipitation nowcasting",
+              "origin": "normalized",
+              "origin_label": "标准化归一"
+            },
+            {
+              "label": "关注方面 A",
+              "key": "A",
+              "value": "high-resolution precipitation nowcasting that captures multiscale precipitation evolution and extreme precipitation",
+              "origin": "inferred",
+              "origin_label": "跨证据归纳"
+            },
+            {
+              "label": "未定空间 Δ",
+              "key": "Delta",
+              "value": "how to generate skillful short-term radar-based precipitation forecasts despite the difficulty of modeling complex precipitation system evolutions at different scales and producing accurate forecasts for extreme precipitation, while keeping probabilistic high-resolution modeling computationally feasible",
+              "origin": "inferred",
+              "origin_label": "跨证据归纳"
+            },
+            {
+              "label": "问题框架 Φ.Σ",
+              "key": "Phi.Sigma",
+              "value": [
+                "radar-based short-term precipitation nowcasting",
+                "deep learning setting with deterministic and probabilistic forecasting approaches",
+                "high-resolution forecasting with multiscale precipitation dynamics",
+                "evaluation on benchmark radar precipitation datasets"
+              ],
+              "origin": "inferred",
+              "origin_label": "跨证据归纳"
+            },
+            {
+              "label": "问题框架 Φ.Ω",
+              "key": "Phi.Omega",
+              "value": [
+                "radar echo observations from SEVIR, HKO-7, and MeteoNet",
+                "forecast horizons up to about 60 minutes conditioned on historical radar frames",
+                "comparison against deterministic, GAN-based, and diffusion-based baselines",
+                "metrics including SSIM, CSI, HSS, and CRPS with emphasis on regional extreme precipitation"
+              ],
+              "origin": "observed",
+              "origin_label": "原文直接给出"
+            },
+            {
+              "label": "问题框架 Φ.τ",
+              "key": "Phi.tau",
+              "value": [
+                "accurate modeling of mesoscale distributions and small-scale patterns",
+                "improved regional extreme-precipitation nowcasting",
+                "computationally efficient probabilistic generation at high resolution",
+                "realistic future radar echo prediction"
+              ],
+              "origin": "inferred",
+              "origin_label": "跨证据归纳"
+            },
+            {
+              "label": "问题摘要",
+              "key": "problem_summary",
+              "value": "The paper studies radar-based precipitation nowcasting, focusing on the unresolved difficulty of forecasting multiscale precipitation evolution and extreme precipitation at high spatial resolution. It frames the problem as needing a probabilistic yet computationally practical forecasting approach that can preserve mesoscale motion, generate small-scale details, and substantially improve regional extreme-event prediction over existing deterministic, GAN, and diffusion baselines.",
+              "origin": null,
+              "origin_label": null
+            },
+            {
+              "label": "抽取置信度",
+              "key": "confidence",
+              "value": 0.91,
+              "origin": null,
+              "origin_label": null
+            }
+          ]
+        },
+        "work_unit": {
+          "label": "工作对象 work_unit",
+          "description": "重建论文中的科学工作 W 及其知识主张、证据与未闭合结构。",
+          "fields": [
+            {
+              "label": "工作标识",
+              "key": "work_id",
+              "value": "work.cascast.cascaded_deterministic_probabilistic_nowcasting",
+              "origin": null,
+              "origin_label": null
+            },
+            {
+              "label": "关联问题",
+              "key": "linked_problem_ids",
+              "value": [
+                "problem.cascast.precipitation_nowcasting_multiscale_extreme_precipitation"
+              ],
+              "origin": null,
+              "origin_label": null
+            },
+            {
+              "label": "表示选择 R",
+              "key": "R",
+              "value": [
+                "cascaded framework composed of a deterministic and a probabilistic part",
+                "decoupled prediction of mesoscale precipitation distributions and small-scale patterns",
+                "probabilistic modeling in a low dimensional latent space",
+                "frame-wise-guided diffusion transformer for high-resolution generation"
+              ],
+              "origin": "observed",
+              "origin_label": "原文直接给出"
+            },
+            {
+              "label": "操作程序 Π",
+              "key": "Pi",
+              "value": [
+                "first produce a deterministic forecast and then generate probabilistic forecasts conditioned on the context and deterministic prediction in latent space",
+                "decouple multiscale precipitation forecasting into global distribution prediction and local detail generation",
+                "train the cascaded framework at high resolution while performing diffusion in low-dimensional latent space to reduce computational cost and improve optimization for extreme events",
+                "use frame-wise guidance so each latent vector aligns with a corresponding blurry prediction frame"
+              ],
+              "origin": "inferred",
+              "origin_label": "跨证据归纳"
+            },
+            {
+              "label": "证据摘要 E",
+              "key": "E_summary",
+              "value": "Across SEVIR, HKO-7, and MeteoNet, CasCast achieves competitive overall performance and strong gains on extreme precipitation and regional pooled CSI metrics; on SEVIR it attains the lowest CRPS in Table 2 and improves CSI-219-POOL16 by up to 91.83% over the deterministic backbone in the ablation.",
+              "origin": null,
+              "origin_label": null
+            },
+            {
+              "label": "知识主张 K.κ",
+              "key": "K.kappa",
+              "value": "A cascaded deterministic-plus-probabilistic design with latent-space frame-wise-guided diffusion improves high-resolution precipitation nowcasting, especially for local patterns and regional extreme precipitation.",
+              "origin": "inferred",
+              "origin_label": "跨证据归纳"
+            },
+            {
+              "label": "主张有效域 K.σ",
+              "key": "K.sigma",
+              "value": [
+                "SEVIR benchmark results in Table 2",
+                "HKO-7 benchmark results in Table 3",
+                "MeteoNet benchmark results in Table 3",
+                "SEVIR ablations on cascaded modeling and frame-wise guidance in Section 4.3"
+              ],
+              "origin": "observed",
+              "origin_label": "原文直接给出"
+            },
+            {
+              "label": "剩余未定结构 Λ.Δ",
+              "key": "Lambda.Lambda_delta",
+              "value": [
+                "latent-space autoencoding causes information loss and makes reconstruction of high-intensity radar echoes more challenging",
+                "CasCast requires retraining on different datasets, which hinders use across different regions and radar data"
+              ],
+              "origin": "observed",
+              "origin_label": "原文直接给出"
+            },
+            {
+              "label": "剩余框架问题 Λ.Φ",
+              "key": "Lambda.Lambda_phi",
+              "value": [
+                "the approach assumes that decoupling mesoscale distributions from small-scale stochastic patterns is an effective decomposition for precipitation nowcasting",
+                "the method depends on a deterministic backbone whose quality affects cascaded generation performance",
+                "evidence emphasizes benchmark metrics on specific datasets rather than cross-dataset unified deployment"
+              ],
+              "origin": "inferred",
+              "origin_label": "跨证据归纳"
+            },
+            {
+              "label": "新暴露方面 Λ.A",
+              "key": "Lambda.Lambda_A",
+              "value": [
+                "improve reconstruction performance for extreme precipitation by increasing or redesigning latent representations",
+                "develop a unified model that can predict precipitation across different datasets and regions without retraining",
+                "further explore cascaded high-resolution probabilistic forecasting architectures for radar echo nowcasting"
+              ],
+              "origin": "observed",
+              "origin_label": "原文直接给出"
+            },
+            {
+              "label": "更新摘要 Ψ",
+              "key": "Psi_summary",
+              "value": "CasCast reframes precipitation nowcasting from choosing between deterministic or probabilistic forecasting to a cascaded decomposition where deterministic mesoscale prediction and probabilistic small-scale generation are combined, with the next open questions centered on latent reconstruction limits and cross-dataset generalization.",
+              "origin": null,
+              "origin_label": null
+            },
+            {
+              "label": "抽取置信度",
+              "key": "confidence",
+              "value": 0.89,
+              "origin": null,
+              "origin_label": null
+            }
+          ]
+        },
+        "update_case": {
+          "label": "更新对象 update_case",
+          "description": "显式表示工作如何把问题从 P 推进到 P'。",
+          "fields": [
+            {
+              "label": "更新标识",
+              "key": "update_id",
+              "value": "update.cascast.cascaded_highres_extreme_nowcasting",
+              "origin": null,
+              "origin_label": null
+            },
+            {
+              "label": "更新前问题",
+              "key": "problem_before_id",
+              "value": "problem.cascast.precipitation_nowcasting_multiscale_and_extremes_unsolved",
+              "origin": null,
+              "origin_label": null
+            },
+            {
+              "label": "对应工作",
+              "key": "work_id",
+              "value": "work.cascast.cascaded_deterministic_probabilistic_latent_diffusion",
+              "origin": null,
+              "origin_label": null
+            },
+            {
+              "label": "更新后问题",
+              "key": "problem_after_id",
+              "value": "problem.cascast.unified_cross_dataset_precipitation_nowcasting",
+              "origin": null,
+              "origin_label": null
+            },
+            {
+              "label": "Δ 更新摘要",
+              "key": "delta_update_summary",
+              "value": "CasCast reduces uncertainty about whether high-resolution precipitation nowcasting can jointly handle multiscale evolution and extreme-event forecasting by using a cascaded deterministic-plus-probabilistic framework with latent-space diffusion, achieving competitive overall results and large gains for regional extreme precipitation.",
+              "origin": null,
+              "origin_label": null
+            },
+            {
+              "label": "Φ 更新摘要",
+              "key": "phi_update_summary",
+              "value": "The work reframes the task from choosing between deterministic blur and unstable/high-cost probabilistic generation to a decoupled formulation: deterministic prediction for mesoscale precipitation distributions and probabilistic generation of small-scale patterns at high resolution in a low-dimensional latent space.",
+              "origin": null,
+              "origin_label": null
+            },
+            {
+              "label": "新方面暴露",
+              "key": "aspect_update_summary",
+              "value": "After this update, the salient remaining aspect is generalization across regions and radar datasets via a unified model, since the current method still requires retraining on each dataset; reconstruction fidelity for extreme-intensity echoes in the latent autoencoder also remains a limitation.",
+              "origin": null,
+              "origin_label": null
+            },
+            {
+              "label": "问题转移理由",
+              "key": "transition_rationale",
+              "value": "The paper begins from two stated unsolved challenges in precipitation nowcasting—multiscale evolution and accurate extreme-precipitation prediction—and presents CasCast as a cascaded solution that directly targets both. Experimental evidence shows strong performance, especially large improvements on regional extreme metrics, supporting that the problem state has advanced. In the conclusion and limitations, the authors then identify the next problem state as building a unified model that transfers across different datasets and regions rather than retraining separately.",
+              "origin": null,
+              "origin_label": null
+            },
+            {
+              "label": "抽取置信度",
+              "key": "confidence",
+              "value": 0.92,
+              "origin": null,
+              "origin_label": null
+            }
+          ]
+        }
+      }
+    },
+    {
+      "paper_id": "weathergfm_2411_05420",
+      "order": 3,
+      "title": "WeatherGFM: Learning A Weather Generalist Foundation Model via In-context Learning",
+      "year": 2024,
+      "short_label": "WeatherGFM",
+      "stage_label": "weather generalist",
+      "graph_teaser": "从单任务模型走向统一多任务、多模态 weather model。",
+      "problem": {
+        "problem_id": "problem.weathergfm.unified_weather_generalist_foundation_model",
+        "summary": "WeatherGFM targets the problem of building a single generalist weather foundation model that can unify diverse weather understanding tasks and data modalities, overcoming the single-task specialization and data-scenario limitations of prior weather models while supporting in-context generalization.",
+        "Delta": "existing data-driven weather models are typically specialized to single tasks and limited observation scenarios, failing to jointly address diverse complex weather tasks and multimodal inputs in one unified model with strong generalization"
+      },
+      "work": {
+        "work_id": "work.weathergfm.weather_generalist_foundation_model",
+        "summary": "WeatherGFM redefines the work unit from building separate models for isolated weather tasks to building a single prompt-driven model that unifies heterogeneous weather tasks and modalities, then tests that unification through multitask, multimodal, and unseen-task prompting.",
+        "E_summary": "Across experiments covering up to ten tasks, WeatherGFM shows strong universal capability and often outperforms single-task UNet and ViT baselines on forecasting, super-resolution, and image translation tasks; OOD prompt tests show correct outputs for several unseen-but-related tasks, though the model fails on a harder multiple-modal satellite spatial SR case."
+      },
+      "update": {
+        "update_id": "update.weathergfm.unified_generalist_weather_reframing",
+        "delta_update_summary": "WeatherGFM reduces uncertainty about whether one model can jointly handle diverse weather understanding tasks and modalities by demonstrating a unified in-context model across forecasting, super-resolution, image translation, and post-processing, with strong results on up to ten tasks and some unseen-task generalization.",
+        "phi_update_summary": "The work reframes weather understanding from building separate task-specific models under limited observation settings to designing a generalist foundation model with unified task representations, weather prompt formats for single, multiple, and temporal modalities, and visual prompting for in-context task execution.",
+        "aspect_update_summary": "It elevates prompt-based interaction, unseen-task generalization, multi-modal task identification, and scaling with more data and larger models as central next-step aspects of the problem.",
+        "transition_rationale": "The selected sections describe a prior problem state where existing weather models are specialized, costly to build, and limited by single-task and single-modality setups. WeatherGFM is presented as the first weather generalist foundation model that unifies diverse tasks and modalities, shows competitive performance across ten tasks, and exhibits some OOD generalization, shifting the field toward generalist multi-task weather modeling and its remaining limits."
+      },
+      "score_summary": {
+        "p_value": {
+          "benchmark_name": "p_value",
+          "paper_id": "weathergfm_2411_05420",
+          "dimension_scores": {
+            "problem_validity": 5,
+            "compression_potential": 5,
+            "boundary_importance": 4,
+            "update_generativity": 5,
+            "residual_openness_quality": 4
+          },
+          "dimension_rationales": {
+            "problem_validity": "The problem is clearly stated, well evidenced, and central to current limitations in weather AI.",
+            "compression_potential": "A unified weather generalist model could replace many separate task-specific formulations with one reusable abstraction.",
+            "boundary_importance": "The task spans major weather modalities and tasks, though it remains bounded to weather understanding rather than all meteorological decision workflows.",
+            "update_generativity": "Solving this problem naturally enables many new task additions, prompt designs, transfer settings, and multimodal extensions.",
+            "residual_openness_quality": "The paper leaves meaningful open questions around scaling, robustness, and true unseen-task generalization."
+          },
+          "overall_score": 4.6,
+          "summary": "This is a high-value problem because it targets a well-motivated and broadly relevant bottleneck: weather models are fragmented across tasks and modalities, and a unified generalist model offers strong compression and expansion benefits. Its scope is ambitious but coherent, with clear evidence and strong potential to generate follow-on work, while still leaving substantial open space around limits and generalization.",
+          "display_summary": "这是一个高价值问题，因为它针对的是一个动机充分、而且影响面很广的瓶颈：weather model 在任务和模态上长期是割裂的，而统一的 generalist model 同时具有明显的压缩价值和扩展价值。这个问题范围虽然雄心很大，但内部逻辑是连贯的，也有清楚证据支撑，并且很容易继续生长出后续工作，同时仍然保留了大量关于极限与泛化的开放空间。",
+          "display_dimension_rationales": {
+            "problem_validity": "这个问题被清楚提出，有充分证据支持，而且正处在 weather AI 当前局限的核心位置。",
+            "compression_potential": "一个统一的 weather generalist model 有潜力把许多分散的 task-specific formulation 压缩成一个可复用抽象。",
+            "boundary_importance": "这个任务跨越了主要的 weather 模态和任务，但它的边界仍然限定在 weather understanding，而不是全部气象决策流程。",
+            "update_generativity": "一旦这个问题被推进，就会自然带来大量新的任务接入、prompt 设计、transfer setting 和多模态扩展。",
+            "residual_openness_quality": "论文留下了有意义的开放问题，包括 scaling、robustness，以及真正的 unseen-task generalization。"
+          }
+        },
+        "w_update": {
+          "benchmark_name": "w_update",
+          "paper_id": "weathergfm_2411_05420",
+          "dimension_scores": {
+            "delta_update": 4,
+            "phi_update": 5,
+            "new_aspect_exposure": 4,
+            "knowledge_strength": 4,
+            "evidence_strength": 4,
+            "problem_transition_quality": 5
+          },
+          "dimension_rationales": {
+            "delta_update": "It substantially reduces doubt that one model can cover many weather tasks and modalities, though unseen-task generalization is partial.",
+            "phi_update": "It strongly reframes the field from separate task-specific weather models to a prompt-conditioned generalist foundation model.",
+            "new_aspect_exposure": "It foregrounds prompt interaction, OOD task prompting, and scaling as important new problem aspects.",
+            "knowledge_strength": "The paper offers a clear, actionable claim that unified in-context weather modeling is feasible and often competitive.",
+            "evidence_strength": "Support is broad across ten tasks, baselines, and OOD tests, but some limits and failures keep it below maximal strength.",
+            "problem_transition_quality": "The before-to-after transition is explicit, well-motivated, and tightly matched to the proposed method and results."
+          },
+          "overall_score": 4.3,
+          "summary": "WeatherGFM delivers a strong update because it both changes the framing of weather modeling and provides credible multitask evidence that a single prompt-based model can unify diverse weather tasks and modalities. The main strength is the conceptual shift to generalist in-context weather understanding, while the main limitation is that generalization beyond training remains similarity-dependent and not uniformly successful.",
+          "display_summary": "WeatherGFM 是一次较强更新，因为它不仅改变了 weather modeling 的问题框架，也用可信的多任务证据表明，单一的 prompt-based model 可以统一多种 weather 任务和模态。它最大的优势是把问题重新表述成 generalist in-context weather understanding；主要限制则在于超出训练分布的泛化仍然依赖相似性，并没有稳定成功。",
+          "display_dimension_rationales": {
+            "delta_update": "它明显降低了“一个模型能否覆盖多种 weather 任务和模态”的疑问，只是对 unseen task 的泛化仍然是部分成立。",
+            "phi_update": "它强力地把领域从分散的 task-specific weather model 重构成一个 prompt-conditioned 的 generalist foundation model。",
+            "new_aspect_exposure": "它把 prompt interaction、OOD 任务 prompting 和 scaling 推到了前台，成为新的核心问题方面。",
+            "knowledge_strength": "论文给出了一个清楚且可操作的主张：统一的 in-context weather modeling 是可行的，而且往往具有竞争力。",
+            "evidence_strength": "支撑证据覆盖了十个任务、多个 baseline 和 OOD 测试，但仍有一些限制与失败案例，因此还不到最强等级。",
+            "problem_transition_quality": "它从“分散的 task-specific weather model”清楚推进到了“generalist weather model”这个新问题状态，前后关系明确，而且与方法和结果紧密对应。"
+          }
+        }
+      },
+      "schema_views": {
+        "problem_unit": {
+          "label": "问题对象 problem_unit",
+          "description": "重建论文中的科学问题 P = (O, A, Δ, Φ)。",
+          "fields": [
+            {
+              "label": "问题标识",
+              "key": "problem_id",
+              "value": "problem.weathergfm.unified_weather_generalist_foundation_model",
+              "origin": null,
+              "origin_label": null
+            },
+            {
+              "label": "研究对象 O",
+              "key": "O",
+              "value": "diverse weather data modalities and weather understanding task inputs",
+              "origin": "normalized",
+              "origin_label": "标准化归一"
+            },
+            {
+              "label": "关注方面 A",
+              "key": "A",
+              "value": "unified handling of multiple weather understanding tasks within a single generalist foundation model",
+              "origin": "inferred",
+              "origin_label": "跨证据归纳"
+            },
+            {
+              "label": "未定空间 Δ",
+              "key": "Delta",
+              "value": "existing data-driven weather models are typically specialized to single tasks and limited observation scenarios, failing to jointly address diverse complex weather tasks and multimodal inputs in one unified model with strong generalization",
+              "origin": "observed",
+              "origin_label": "原文直接给出"
+            },
+            {
+              "label": "问题框架 Φ.Σ",
+              "key": "Phi.Sigma",
+              "value": [
+                "weather understanding spans forecasting, super-resolution, image translation, and post-processing",
+                "weather data come from single-modal, multi-modal, and temporal observation modalities",
+                "the model is intended to support seen and unseen tasks through in-context learning"
+              ],
+              "origin": "inferred",
+              "origin_label": "跨证据归纳"
+            },
+            {
+              "label": "问题框架 Φ.Ω",
+              "key": "Phi.Omega",
+              "value": [
+                "weather observations from satellites, radar, weather stations, and related aligned datasets such as SEVIR and GEOS-CF/POMINO-TROPOMI",
+                "a unified representation and weather prompt formats for different modalities",
+                "evaluation over up to ten weather understanding tasks with RMSE and CSI metrics"
+              ],
+              "origin": "observed",
+              "origin_label": "原文直接给出"
+            },
+            {
+              "label": "问题框架 Φ.τ",
+              "key": "Phi.tau",
+              "value": [
+                "ability to perform multiple weather tasks in one model",
+                "generalization to unseen or out-of-distribution tasks",
+                "competitive task performance relative to single-task baselines"
+              ],
+              "origin": "inferred",
+              "origin_label": "跨证据归纳"
+            },
+            {
+              "label": "问题摘要",
+              "key": "problem_summary",
+              "value": "WeatherGFM targets the problem of building a single generalist weather foundation model that can unify diverse weather understanding tasks and data modalities, overcoming the single-task specialization and data-scenario limitations of prior weather models while supporting in-context generalization.",
+              "origin": null,
+              "origin_label": null
+            },
+            {
+              "label": "抽取置信度",
+              "key": "confidence",
+              "value": 0.93,
+              "origin": null,
+              "origin_label": null
+            }
+          ]
+        },
+        "work_unit": {
+          "label": "工作对象 work_unit",
+          "description": "重建论文中的科学工作 W 及其知识主张、证据与未闭合结构。",
+          "fields": [
+            {
+              "label": "工作标识",
+              "key": "work_id",
+              "value": "work.weathergfm.weather_generalist_foundation_model",
+              "origin": null,
+              "origin_label": null
+            },
+            {
+              "label": "关联问题",
+              "key": "linked_problem_ids",
+              "value": [
+                "problem.weathergfm.unified_multitask_multimodal_weather_understanding"
+              ],
+              "origin": null,
+              "origin_label": null
+            },
+            {
+              "label": "表示选择 R",
+              "key": "R",
+              "value": [
+                "unified representation and definition for diverse weather understanding tasks",
+                "weather prompt formats for single-modal, multi-modal, and temporal weather data",
+                "visual prompting question-answering paradigm with in-context learning for unified weather tasks",
+                "single WeatherGFM generalist foundation model handling forecasting, super-resolution, image translation, and post-processing"
+              ],
+              "origin": "observed",
+              "origin_label": "原文直接给出"
+            },
+            {
+              "label": "操作程序 Π",
+              "key": "Pi",
+              "value": [
+                "cast heterogeneous weather understanding problems into a common prompt-conditioned input-output format",
+                "use modality-specific weather prompt phrases to unify sequence, multi-modal, and single-modal data within one model",
+                "train the model under a visual prompting question-answering paradigm so it can perform multiple seen tasks and respond to unseen-task prompts"
+              ],
+              "origin": "inferred",
+              "origin_label": "跨证据归纳"
+            },
+            {
+              "label": "证据摘要 E",
+              "key": "E_summary",
+              "value": "Across experiments covering up to ten tasks, WeatherGFM shows strong universal capability and often outperforms single-task UNet and ViT baselines on forecasting, super-resolution, and image translation tasks; OOD prompt tests show correct outputs for several unseen-but-related tasks, though the model fails on a harder multiple-modal satellite spatial SR case.",
+              "origin": null,
+              "origin_label": null
+            },
+            {
+              "label": "知识主张 K.κ",
+              "key": "K.kappa",
+              "value": "A prompt-based generalist foundation model can unify multiple weather understanding tasks and weather data modalities within one in-context learning framework while achieving competitive or superior performance to single-task baselines on many tasks.",
+              "origin": "inferred",
+              "origin_label": "跨证据归纳"
+            },
+            {
+              "label": "主张有效域 K.σ",
+              "key": "K.sigma",
+              "value": [
+                "experiments on up to 10 tasks spanning weather forecasting, weather super-resolution, weather image translation, and post-processing",
+                "SEVIR dataset with four sensing modalities and GEOS-CF/POMINO-TROPOMI image-translation data",
+                "evaluation with RMSE and CSI across multiple task-specific thresholds",
+                "OOD prompt evaluations including GEOS-IR107 extrapolation, GEOS-IR107 to GEOS-IR069 translation, temporal SR at 15 minutes, and GEOS-visible satellite extrapolation"
+              ],
+              "origin": "observed",
+              "origin_label": "原文直接给出"
+            },
+            {
+              "label": "剩余未定结构 Λ.Δ",
+              "key": "Lambda.Lambda_delta",
+              "value": [
+                "performance varies across different prompts, with forecasting and image transformation tasks showing about 0.02 CSI variability across 20 prompts",
+                "the model encounters difficulties on the more challenging out-of-distribution task of multiple-modal satellite spatial SR, where outputs fail to provide effective meteorological information",
+                "the paper explicitly states that the purpose is not to achieve state-of-the-art performance on every task"
+              ],
+              "origin": "observed",
+              "origin_label": "原文直接给出"
+            },
+            {
+              "label": "剩余框架问题 Λ.Φ",
+              "key": "Lambda.Lambda_phi",
+              "value": [
+                "the framing shifts weather foundation modeling away from pre-training-plus-fine-tuning single-task systems toward prompt-conditioned in-context generalist weather understanding",
+                "generalization to unseen tasks is presented as strongest for tasks similar to the training distribution, indicating the current notion of generality remains similarity-dependent"
+              ],
+              "origin": "inferred",
+              "origin_label": "跨证据归纳"
+            },
+            {
+              "label": "新暴露方面 Λ.A",
+              "key": "Lambda.Lambda_A",
+              "value": [
+                "future large-scale generalist weather and climate foundation models",
+                "scaling model and data size as a route to better multi-task weather performance",
+                "interactive prompt-based weather models that adapt outputs to specific weather cases"
+              ],
+              "origin": "inferred",
+              "origin_label": "跨证据归纳"
+            },
+            {
+              "label": "更新摘要 Ψ",
+              "key": "Psi_summary",
+              "value": "WeatherGFM redefines the work unit from building separate models for isolated weather tasks to building a single prompt-driven model that unifies heterogeneous weather tasks and modalities, then tests that unification through multitask, multimodal, and unseen-task prompting.",
+              "origin": null,
+              "origin_label": null
+            },
+            {
+              "label": "抽取置信度",
+              "key": "confidence",
+              "value": 0.9,
+              "origin": null,
+              "origin_label": null
+            }
+          ]
+        },
+        "update_case": {
+          "label": "更新对象 update_case",
+          "description": "显式表示工作如何把问题从 P 推进到 P'。",
+          "fields": [
+            {
+              "label": "更新标识",
+              "key": "update_id",
+              "value": "update.weathergfm.unified_generalist_weather_reframing",
+              "origin": null,
+              "origin_label": null
+            },
+            {
+              "label": "更新前问题",
+              "key": "problem_before_id",
+              "value": "problem.weathergfm.single_task_weather_understanding_with_limited_modal_generalization",
+              "origin": null,
+              "origin_label": null
+            },
+            {
+              "label": "对应工作",
+              "key": "work_id",
+              "value": "work.weathergfm.weather_generalist_foundation_model",
+              "origin": null,
+              "origin_label": null
+            },
+            {
+              "label": "更新后问题",
+              "key": "problem_after_id",
+              "value": "problem.weathergfm.generalist_multi_task_multi_modal_weather_understanding_with_unseen_task_generalization",
+              "origin": null,
+              "origin_label": null
+            },
+            {
+              "label": "Δ 更新摘要",
+              "key": "delta_update_summary",
+              "value": "WeatherGFM reduces uncertainty about whether one model can jointly handle diverse weather understanding tasks and modalities by demonstrating a unified in-context model across forecasting, super-resolution, image translation, and post-processing, with strong results on up to ten tasks and some unseen-task generalization.",
+              "origin": null,
+              "origin_label": null
+            },
+            {
+              "label": "Φ 更新摘要",
+              "key": "phi_update_summary",
+              "value": "The work reframes weather understanding from building separate task-specific models under limited observation settings to designing a generalist foundation model with unified task representations, weather prompt formats for single, multiple, and temporal modalities, and visual prompting for in-context task execution.",
+              "origin": null,
+              "origin_label": null
+            },
+            {
+              "label": "新方面暴露",
+              "key": "aspect_update_summary",
+              "value": "It elevates prompt-based interaction, unseen-task generalization, multi-modal task identification, and scaling with more data and larger models as central next-step aspects of the problem.",
+              "origin": null,
+              "origin_label": null
+            },
+            {
+              "label": "问题转移理由",
+              "key": "transition_rationale",
+              "value": "The selected sections describe a prior problem state where existing weather models are specialized, costly to build, and limited by single-task and single-modality setups. WeatherGFM is presented as the first weather generalist foundation model that unifies diverse tasks and modalities, shows competitive performance across ten tasks, and exhibits some OOD generalization, shifting the field toward generalist multi-task weather modeling and its remaining limits.",
+              "origin": null,
+              "origin_label": null
+            },
+            {
+              "label": "抽取置信度",
+              "key": "confidence",
+              "value": 0.88,
+              "origin": null,
+              "origin_label": null
+            }
+          ]
+        }
+      }
+    },
+    {
+      "paper_id": "omni_weather_2512_21643",
+      "order": 4,
+      "title": "Omni-Weather: Unified Multimodal Foundation Model for Weather Generation and Understanding",
+      "year": 2025,
+      "short_label": "Omni-Weather",
+      "stage_label": "generation + understanding unified",
+      "graph_teaser": "把 generation、understanding 和 reasoning 合到同一框架里。",
+      "problem": {
+        "problem_id": "problem.omni_weather.unified_weather_generation_understanding",
+        "summary": "Omni-Weather addresses the lack of a unified weather model that can both generate or predict weather fields and understand or explain them, framing the task as integrating multimodal weather generation, diagnostic reasoning, and interpretable chain-of-thought within one shared foundation-model architecture.",
+        "Delta": "existing weather methods separate generation from understanding, so the problem is how to build a single weather foundation model that can both synthesize/predict physical weather fields and provide mechanistic interpretation or diagnostic reasoning, while allowing the two capabilities to mutually enhance each other"
+      },
+      "work": {
+        "work_id": "work.omni_weather.unified_generation_understanding_foundation_model",
+        "summary": "Omni-Weather reframes weather AI from separate pipelines for prediction and interpretation into a unified multimodal foundation-model problem where generation, understanding, and causal-style reasoning are trained together and evaluated for mutual gains as well as interpretability.",
+        "E_summary": "Omni-Weather is reported to achieve state-of-the-art or superior results across weather generation and understanding tasks, outperforming specialized baselines in nowcasting, radar inversion, and radar understanding, while joint training improves both generation and understanding relative to single-task training."
+      },
+      "update": {
+        "update_id": "update.omni_weather.unified_generation_understanding_reasoning",
+        "delta_update_summary": "Omni-Weather reduces uncertainty about whether a single weather model can jointly perform generation and understanding by showing a shared-backbone multimodal foundation model that achieves state-of-the-art or stronger-than-specialized results across nowcasting, radar inversion, and weather understanding tasks.",
+        "phi_update_summary": "The work reframes the weather-modeling problem from separate generation-only and understanding-only systems to a unified multimodal foundation-model setting where shared representations, joint training, and Chain-of-Thought reasoning are central design elements.",
+        "aspect_update_summary": "It elevates cross-task mutual enhancement, perceptual-versus-pixel trade-offs from reasoning, broader task coverage, adaptation to general-domain VAEs, and faithfulness of reasoning traces as the next key aspects of the problem.",
+        "transition_rationale": "The selected sections explicitly position prior weather methods as disjoint across generation and understanding, then present Omni-Weather as the first unified model and show joint-training gains and reasoning-enabled interpretability. The conclusion and limitations indicate that the new open problem is not simply achieving either generation or understanding alone, but making unified weather foundation models broader, more faithful, and more robust across additional tasks and modalities."
+      },
+      "score_summary": {
+        "p_value": {
+          "benchmark_name": "p_value",
+          "paper_id": "omni_weather_2512_21643",
+          "dimension_scores": {
+            "problem_validity": 5,
+            "compression_potential": 4,
+            "boundary_importance": 5,
+            "update_generativity": 5,
+            "residual_openness_quality": 4
+          },
+          "dimension_rationales": {
+            "problem_validity": "The paper identifies a clear, well-evidenced gap between weather generation and understanding that current methods treat separately.",
+            "compression_potential": "A unified formulation plausibly compresses multiple weather tasks and modalities into one reusable problem framing.",
+            "boundary_importance": "The problem sets an important boundary for weather AI by linking predictive performance with interpretability in one system.",
+            "update_generativity": "The framing naturally generates many follow-on updates in architecture, supervision, evaluation, and multimodal task expansion.",
+            "residual_openness_quality": "The problem remains meaningfully open through trade-offs between reasoning quality, perceptual gains, and deterministic accuracy."
+          },
+          "overall_score": 4.6,
+          "summary": "This is a strong, high-value problem unit because it targets a real and consequential gap in weather modeling: the separation between accurate field generation and interpretable understanding. Its unified framing has substantial compression and research-program value, establishes an important benchmark boundary for multimodal weather foundation models, and leaves productive open questions around how to balance reasoning, explainability, and forecasting fidelity.",
+          "display_summary": "这是一个强且高价值的问题单元，因为它针对的是 weather modeling 中一个真实而重要的断裂：准确的场生成与可解释的理解长期被分开处理。它的统一表述既有明显的压缩价值，也有研究程序上的组织价值，为 multimodal weather foundation model 划出了一条重要 benchmark 边界，同时还保留了关于 reasoning、explainability 和 forecasting fidelity 如何平衡的大量有效开放问题。",
+          "display_dimension_rationales": {
+            "problem_validity": "论文识别出了一个清楚且有证据支撑的缺口：现有方法通常把 weather generation 与 understanding 分开处理。",
+            "compression_potential": "统一表述有很强的可能性把多个 weather 任务和模态压缩到同一个可复用的问题框架中。",
+            "boundary_importance": "这个问题为 weather AI 划出了一条重要边界，因为它把预测表现与可解释理解放进了同一个系统目标里。",
+            "update_generativity": "这种问题表述天然会继续生长出后续更新，包括架构、监督方式、评估方法以及更多多模态任务扩展。",
+            "residual_openness_quality": "这个问题仍然明显开放，因为在 reasoning quality、感知增益和确定性精度之间仍存在关键权衡。"
+          }
+        },
+        "w_update": {
+          "benchmark_name": "w_update",
+          "paper_id": "omni_weather_2512_21643",
+          "dimension_scores": {
+            "delta_update": 5,
+            "phi_update": 5,
+            "new_aspect_exposure": 5,
+            "knowledge_strength": 4,
+            "evidence_strength": 4,
+            "problem_transition_quality": 5
+          },
+          "dimension_rationales": {
+            "delta_update": "The work strongly reduces uncertainty by demonstrating one model can jointly handle weather generation and understanding with strong results across both.",
+            "phi_update": "It clearly reframes the problem from separated task-specific systems to a unified multimodal foundation-model formulation with shared training and reasoning.",
+            "new_aspect_exposure": "It surfaces important next-step aspects including mutual gains, reasoning trade-offs, broader validation, VAE adaptation, and faithfulness of explanations.",
+            "knowledge_strength": "The paper supports a fairly strong general claim about unified training and reasoning, though it remains validated on a limited task set.",
+            "evidence_strength": "The evidence includes comparative experiments, ablations, and limitations, but broader external validation across more weather regimes is still missing.",
+            "problem_transition_quality": "The transition from disjoint generation/understanding to unified models with broader and more faithful reasoning requirements is explicit and well motivated."
+          },
+          "overall_score": 4.7,
+          "summary": "This is a high-value update because Omni-Weather does more than improve metrics: it changes the problem framing. The paper provides strong evidence that unified weather generation and understanding is feasible and beneficial, while also identifying the next frontier as broader coverage, stronger faithfulness, and better robustness. Scores are highest on delta, phi, aspect exposure, and transition quality, with slightly lower scores on knowledge and evidence because validation is still concentrated on a limited set of tasks and settings.",
+          "display_summary": "这是一次高价值更新，因为 Omni-Weather 不只是把指标做得更高，而是改变了问题框架。论文用较强证据表明，统一的 weather generation 与 understanding 不仅可行，而且是有益的；同时它也把下一步前沿明确为更广覆盖、更强忠实性和更好鲁棒性。在各子指标里，未定空间更新、框架更新、新方面暴露和问题转移质量最高；知识主张与证据强度略低一些，因为验证仍集中在相对有限的任务与设定上。",
+          "display_dimension_rationales": {
+            "delta_update": "这项工作显著压缩了核心未定空间，因为它用实证结果表明同一个模型可以同时承担天气生成与理解，并且在两类任务上都取得了较强表现。",
+            "phi_update": "它把问题从彼此分离的 task-specific system，清楚重构成一个共享训练与推理的统一多模态 foundation model。",
+            "new_aspect_exposure": "它暴露出了下一步的重要方面，包括双向增益、推理权衡、更广验证、VAE 适配，以及解释是否忠实。",
+            "knowledge_strength": "论文支撑了一个相当强的总体主张：统一训练与统一推理是可行的，只是目前仍在较有限的任务集上得到验证。",
+            "evidence_strength": "证据包括对比实验、ablation 和局限分析，但在更多天气情景上的外部验证仍然不足。",
+            "problem_transition_quality": "它把问题从“generation/understanding 相互割裂”明确推进到“统一模型下如何获得更广覆盖和更忠实推理”，这个转移清楚而且动机充分。"
+          }
+        }
+      },
+      "schema_views": {
+        "problem_unit": {
+          "label": "问题对象 problem_unit",
+          "description": "重建论文中的科学问题 P = (O, A, Δ, Φ)。",
+          "fields": [
+            {
+              "label": "问题标识",
+              "key": "problem_id",
+              "value": "problem.omni_weather.unified_weather_generation_understanding",
+              "origin": null,
+              "origin_label": null
+            },
+            {
+              "label": "研究对象 O",
+              "key": "O",
+              "value": "weather observations and weather signals across radar, satellite, atmospheric fields, and related multimodal inputs",
+              "origin": "normalized",
+              "origin_label": "标准化归一"
+            },
+            {
+              "label": "关注方面 A",
+              "key": "A",
+              "value": "unified weather generation and understanding with interpretable reasoning",
+              "origin": "inferred",
+              "origin_label": "跨证据归纳"
+            },
+            {
+              "label": "未定空间 Δ",
+              "key": "Delta",
+              "value": "existing weather methods separate generation from understanding, so the problem is how to build a single weather foundation model that can both synthesize/predict physical weather fields and provide mechanistic interpretation or diagnostic reasoning, while allowing the two capabilities to mutually enhance each other",
+              "origin": "inferred",
+              "origin_label": "跨证据归纳"
+            },
+            {
+              "label": "问题框架 Φ.Σ",
+              "key": "Phi.Sigma",
+              "value": [
+                "weather domain setting requiring both predictive accuracy and interpretability",
+                "joint handling of generation tasks such as nowcasting and inversion and understanding tasks such as diagnostic reasoning and question answering",
+                "multimodal foundation-model formulation with shared backbone/self-attention"
+              ],
+              "origin": "inferred",
+              "origin_label": "跨证据归纳"
+            },
+            {
+              "label": "问题框架 Φ.Ω",
+              "key": "Phi.Omega",
+              "value": [
+                "radar generation tasks including radar nowcasting",
+                "satellite-to-radar or multimodal radar inversion",
+                "weather understanding benchmarks including radar image understanding and radar sequence understanding",
+                "Chain-of-Thought supervision for causal reasoning in weather generation"
+              ],
+              "origin": "observed",
+              "origin_label": "原文直接给出"
+            },
+            {
+              "label": "问题框架 Φ.τ",
+              "key": "Phi.tau",
+              "value": [
+                "state-of-the-art or superior performance on both weather generation and understanding",
+                "interpretable or explainable outputs with reasoning traces",
+                "improved perceptual quality with limited loss in deterministic accuracy",
+                "mutual gains from joint training across generation and understanding"
+              ],
+              "origin": "inferred",
+              "origin_label": "跨证据归纳"
+            },
+            {
+              "label": "问题摘要",
+              "key": "problem_summary",
+              "value": "Omni-Weather addresses the lack of a unified weather model that can both generate or predict weather fields and understand or explain them, framing the task as integrating multimodal weather generation, diagnostic reasoning, and interpretable chain-of-thought within one shared foundation-model architecture.",
+              "origin": null,
+              "origin_label": null
+            },
+            {
+              "label": "抽取置信度",
+              "key": "confidence",
+              "value": 0.92,
+              "origin": null,
+              "origin_label": null
+            }
+          ]
+        },
+        "work_unit": {
+          "label": "工作对象 work_unit",
+          "description": "重建论文中的科学工作 W 及其知识主张、证据与未闭合结构。",
+          "fields": [
+            {
+              "label": "工作标识",
+              "key": "work_id",
+              "value": "work.omni_weather.unified_generation_understanding_foundation_model",
+              "origin": null,
+              "origin_label": null
+            },
+            {
+              "label": "关联问题",
+              "key": "linked_problem_ids",
+              "value": [
+                "problem.omni_weather.unified_weather_generation_understanding"
+              ],
+              "origin": null,
+              "origin_label": null
+            },
+            {
+              "label": "表示选择 R",
+              "key": "R",
+              "value": [
+                "unified multimodal foundation model for both weather generation and understanding",
+                "shared self-attention backbone with a radar encoder for weather generation tasks",
+                "Chain-of-Thought dataset and thinking inference for causal reasoning in weather generation"
+              ],
+              "origin": "observed",
+              "origin_label": "原文直接给出"
+            },
+            {
+              "label": "操作程序 Π",
+              "key": "Pi",
+              "value": [
+                "jointly train generation tasks such as nowcasting and inversion together with understanding tasks such as diagnostic reasoning and question answering within a single model",
+                "use a shared backbone to learn transferable representations of storm evolution that benefit both prediction and interpretation",
+                "finetune with explicit reasoning supervision and use thinking inference to improve perceptual quality and interpretability"
+              ],
+              "origin": "inferred",
+              "origin_label": "跨证据归纳"
+            },
+            {
+              "label": "证据摘要 E",
+              "key": "E_summary",
+              "value": "Omni-Weather is reported to achieve state-of-the-art or superior results across weather generation and understanding tasks, outperforming specialized baselines in nowcasting, radar inversion, and radar understanding, while joint training improves both generation and understanding relative to single-task training.",
+              "origin": null,
+              "origin_label": null
+            },
+            {
+              "label": "知识主张 K.κ",
+              "key": "K.kappa",
+              "value": "A single unified multimodal model with shared backbone and reasoning supervision can jointly perform weather generation and understanding, and the two task families can mutually enhance performance while improving interpretability and perceptual quality.",
+              "origin": "inferred",
+              "origin_label": "跨证据归纳"
+            },
+            {
+              "label": "主张有效域 K.σ",
+              "key": "K.sigma",
+              "value": [
+                "weather generation tasks including radar nowcasting and radar inversion",
+                "weather understanding tasks including radar image understanding and radar sequence understanding",
+                "joint supervised finetuning setting comparing understanding-only, generation-only, and joint training",
+                "CoT finetuning and thinking inference evaluation setting"
+              ],
+              "origin": "observed",
+              "origin_label": "原文直接给出"
+            },
+            {
+              "label": "剩余未定结构 Λ.Δ",
+              "key": "Lambda.Lambda_delta",
+              "value": [
+                "thinking inference introduces trade-offs by improving perceptual metrics while causing minor or moderate declines in pixel-level metrics such as CSI",
+                "Omni-Weather cannot yet adapt to general-domain VAEs",
+                "broader validation across diverse weather tasks such as medium-range forecasting and typhoon track prediction remains necessary",
+                "reasoning traces may be imperfect and require stronger faithfulness guarantees"
+              ],
+              "origin": "observed",
+              "origin_label": "原文直接给出"
+            },
+            {
+              "label": "剩余框架问题 Λ.Φ",
+              "key": "Lambda.Lambda_phi",
+              "value": [
+                "the unified formulation is still validated mainly on a limited set of weather generation and radar understanding tasks rather than a fully general weather intelligence setting",
+                "interpretability via reasoning traces is promising but not yet guaranteed to faithfully align with generated or predicted fields"
+              ],
+              "origin": "inferred",
+              "origin_label": "跨证据归纳"
+            },
+            {
+              "label": "新暴露方面 Λ.A",
+              "key": "Lambda.Lambda_A",
+              "value": [
+                "broader multi-task transfer and scalable evaluation across heterogeneous meteorological modalities",
+                "extension to additional weather tasks such as medium-range forecasting and typhoon track prediction",
+                "stronger faithfulness mechanisms for reasoning traces aligned with generated and predicted weather fields"
+              ],
+              "origin": "inferred",
+              "origin_label": "跨证据归纳"
+            },
+            {
+              "label": "更新摘要 Ψ",
+              "key": "Psi_summary",
+              "value": "Omni-Weather reframes weather AI from separate pipelines for prediction and interpretation into a unified multimodal foundation-model problem where generation, understanding, and causal-style reasoning are trained together and evaluated for mutual gains as well as interpretability.",
+              "origin": null,
+              "origin_label": null
+            },
+            {
+              "label": "抽取置信度",
+              "key": "confidence",
+              "value": 0.9,
+              "origin": null,
+              "origin_label": null
+            }
+          ]
+        },
+        "update_case": {
+          "label": "更新对象 update_case",
+          "description": "显式表示工作如何把问题从 P 推进到 P'。",
+          "fields": [
+            {
+              "label": "更新标识",
+              "key": "update_id",
+              "value": "update.omni_weather.unified_generation_understanding_reasoning",
+              "origin": null,
+              "origin_label": null
+            },
+            {
+              "label": "更新前问题",
+              "key": "problem_before_id",
+              "value": "problem.omni_weather.separated_weather_generation_and_understanding",
+              "origin": null,
+              "origin_label": null
+            },
+            {
+              "label": "对应工作",
+              "key": "work_id",
+              "value": "work.omni_weather.multimodal_foundation_model",
+              "origin": null,
+              "origin_label": null
+            },
+            {
+              "label": "更新后问题",
+              "key": "problem_after_id",
+              "value": "problem.omni_weather.unified_weather_foundation_model_with_faithful_reasoning_and_broader_validation",
+              "origin": null,
+              "origin_label": null
+            },
+            {
+              "label": "Δ 更新摘要",
+              "key": "delta_update_summary",
+              "value": "Omni-Weather reduces uncertainty about whether a single weather model can jointly perform generation and understanding by showing a shared-backbone multimodal foundation model that achieves state-of-the-art or stronger-than-specialized results across nowcasting, radar inversion, and weather understanding tasks.",
+              "origin": null,
+              "origin_label": null
+            },
+            {
+              "label": "Φ 更新摘要",
+              "key": "phi_update_summary",
+              "value": "The work reframes the weather-modeling problem from separate generation-only and understanding-only systems to a unified multimodal foundation-model setting where shared representations, joint training, and Chain-of-Thought reasoning are central design elements.",
+              "origin": null,
+              "origin_label": null
+            },
+            {
+              "label": "新方面暴露",
+              "key": "aspect_update_summary",
+              "value": "It elevates cross-task mutual enhancement, perceptual-versus-pixel trade-offs from reasoning, broader task coverage, adaptation to general-domain VAEs, and faithfulness of reasoning traces as the next key aspects of the problem.",
+              "origin": null,
+              "origin_label": null
+            },
+            {
+              "label": "问题转移理由",
+              "key": "transition_rationale",
+              "value": "The selected sections explicitly position prior weather methods as disjoint across generation and understanding, then present Omni-Weather as the first unified model and show joint-training gains and reasoning-enabled interpretability. The conclusion and limitations indicate that the new open problem is not simply achieving either generation or understanding alone, but making unified weather foundation models broader, more faithful, and more robust across additional tasks and modalities.",
+              "origin": null,
+              "origin_label": null
+            },
+            {
+              "label": "抽取置信度",
+              "key": "confidence",
+              "value": 0.91,
+              "origin": null,
+              "origin_label": null
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "frontier": {
+    "current_state": "The selected sections explicitly position prior weather methods as disjoint across generation and understanding, then present Omni-Weather as the first unified model and show joint-training gains and reasoning-enabled interpretability. The conclusion and limitations indicate that the new open problem is not simply achieving either generation or understanding alone, but making unified weather foundation models broader, more faithful, and more robust across additional tasks and modalities.",
+    "next_value_question": "在 generation 与 understanding 统一之后，下一步高价值问题更可能围绕可靠性、可解释性、因果性与多模态推理闭环展开。"
+  }
+}

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ExploreMethod 框架展示页</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <main id="home-view" class="view">
+        <section class="hero-card">
+          <p id="home-hero-label" class="eyebrow">ExploreMethod</p>
+          <h1 id="home-hero-title">加载中…</h1>
+          <p id="home-hero-subtitle" class="hero-subtitle"></p>
+        </section>
+
+        <section class="home-grid">
+          <section class="panel intro-panel">
+            <div class="panel-header">
+              <h2>项目介绍</h2>
+              <p>先讲目标，再讲 judge，最后通过 graph 进入单篇论文。</p>
+            </div>
+            <div id="home-goal-sections" class="stack-list"></div>
+          </section>
+
+          <section class="panel criteria-panel">
+            <div class="panel-header">
+              <h2>Judge 准则</h2>
+              <p>首页讲清“在 judge 什么”；具体评分理由在单篇详情页里展开。</p>
+            </div>
+            <div id="home-criteria" class="criteria-grid"></div>
+          </section>
+
+          <section class="panel graph-panel">
+            <div class="panel-header">
+              <h2>案例 Graph</h2>
+              <p id="graph-intro">-</p>
+            </div>
+            <div id="paper-graph" class="paper-graph"></div>
+          </section>
+        </section>
+
+        <section class="panel case-study-panel">
+          <div class="panel-header">
+            <h2>这个案例怎么来的</h2>
+            <p id="case-study-subtitle">-</p>
+          </div>
+          <div id="case-study-sections" class="stack-list"></div>
+        </section>
+      </main>
+
+      <main id="paper-view" class="view is-hidden">
+        <section class="paper-hero">
+          <button id="back-home" class="back-button" type="button">返回首页</button>
+          <div class="paper-hero-copy">
+            <p id="paper-stage" class="eyebrow">-</p>
+            <h1 id="paper-title">-</h1>
+            <p id="paper-meta" class="hero-subtitle">-</p>
+          </div>
+        </section>
+
+        <section class="paper-layout">
+          <section class="panel overview-panel">
+            <div class="panel-header">
+              <h2>整体分析</h2>
+              <p>这篇论文在主链中的位置，以及它把问题推进到了哪里。</p>
+            </div>
+            <div id="paper-overview" class="stack-list"></div>
+          </section>
+
+          <section class="panel score-panel">
+            <div class="panel-header">
+              <h2>评分与原因</h2>
+              <p>每个子指标都展示真实分数与对应理由。</p>
+            </div>
+            <div id="paper-score-cards" class="score-grid"></div>
+          </section>
+
+          <section class="panel schema-panel">
+            <div class="panel-header">
+              <h2>Schema 重建</h2>
+              <p id="schema-note">-</p>
+            </div>
+            <article id="schema-intro-card" class="content-card"></article>
+            <div id="paper-schema" class="schema-views"></div>
+          </section>
+        </section>
+      </main>
+    </div>
+
+    <script src="./app.js" type="module"></script>
+  </body>
+</html>
